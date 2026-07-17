@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<title>Pretzel Party</title>
+<meta name="description" content="Mix, shape, decorate, bake and eat your own pretzel!">
+<meta name="theme-color" content="#e07a2f">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Pretzels">
+<style>
+:root{
+  --bg:#fff3e0; --card:#ffffff; --ink:#4a3423; --ink-soft:#8a6f52;
+  --brand:#e07a2f; --brand-dark:#c9641d; --accent:#59a96a; --accent-dark:#468a55;
+  --soft:#ffe3c2; --line:#f0ddc6; --danger:#e5484d; --radius:20px;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0; padding:0;}
+body{
+  font-family:ui-rounded,"Segoe UI Rounded","Segoe UI",system-ui,-apple-system,sans-serif;
+  background:var(--bg); color:var(--ink);
+  min-height:100dvh; display:flex; flex-direction:column;
+  touch-action:manipulation; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none;
+  overflow-x:hidden;
+  padding-left:env(safe-area-inset-left); padding-right:env(safe-area-inset-right);
+}
+header{
+  display:flex; align-items:center; gap:10px;
+  padding:calc(10px + env(safe-area-inset-top)) 14px 10px;
+  position:sticky; top:0; background:var(--bg); z-index:10;
+}
+header h1{font-size:22px; margin:0; flex:1; text-align:center; white-space:nowrap;}
+.icon-btn{
+  width:48px; height:48px; border-radius:16px; border:2px solid var(--line);
+  background:var(--card); font-size:22px; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; flex:none;
+}
+.icon-btn:active{transform:scale(.93);}
+.icon-btn[hidden]{display:none;}
+.spacer48{width:48px; flex:none;}
+.steps{display:flex; justify-content:center; gap:14px; padding:0 0 4px;}
+.steps[hidden]{display:none;}
+.step{font-size:22px; opacity:.3; transition:all .25s; transform:scale(.9);}
+.step.on{opacity:1; transform:scale(1.3);}
+main{flex:1; display:flex; flex-direction:column; width:100%; max-width:520px; margin:0 auto;}
+.screen{display:none; flex-direction:column; align-items:center; gap:14px; padding:8px 16px calc(28px + env(safe-area-inset-bottom)); flex:1;}
+.screen.active{display:flex;}
+h2{font-size:26px; margin:4px 0 0; text-align:center;}
+.sub{font-size:17px; color:var(--ink-soft); margin:0; text-align:center;}
+.btn{
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  border:none; border-radius:18px; padding:16px 24px; font-size:20px; font-weight:700;
+  font-family:inherit; color:var(--ink); background:var(--card); cursor:pointer;
+  box-shadow:0 4px 0 rgba(90,60,20,.15); min-height:58px;
+}
+.btn:active{transform:translateY(3px); box-shadow:0 1px 0 rgba(90,60,20,.15);}
+.btn:disabled{opacity:.45; pointer-events:none;}
+.btn-primary{background:var(--brand); color:#fff; box-shadow:0 4px 0 var(--brand-dark);}
+.btn-go{background:var(--accent); color:#fff; box-shadow:0 4px 0 var(--accent-dark);}
+.btn-soft{border:2px solid var(--line);}
+.btn-danger{background:var(--danger); color:#fff; box-shadow:0 4px 0 #b8383c;}
+.btn-big{font-size:24px; padding:20px 28px; width:100%;}
+.btn-row{display:flex; gap:12px; width:100%; justify-content:center; flex-wrap:wrap;}
+.btn-row .btn{flex:1; min-width:140px;}
+/* home */
+.hero{font-size:96px; line-height:1; margin-top:16px; animation:bob 2.4s ease-in-out infinite;}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg);}50%{transform:translateY(-12px) rotate(4deg);}}
+.count-line{font-size:17px; color:var(--ink-soft); min-height:22px; margin:0;}
+.home-btns{display:flex; flex-direction:column; gap:14px; width:100%; max-width:340px; margin-top:6px;}
+/* mix */
+.bowl-zone{display:flex; flex-direction:column; align-items:center; gap:6px; min-height:210px; justify-content:flex-end;}
+.bowl-btn{background:none; border:none; padding:0; cursor:pointer; font-family:inherit;}
+.bowl{
+  width:230px; height:125px; border-radius:0 0 125px 125px; position:relative; overflow:hidden;
+  background:linear-gradient(180deg,#f9a26c,#ef8354); border-top:10px solid #f9b58a;
+  box-shadow:0 8px 0 rgba(90,60,20,.18);
+}
+.blob{
+  position:absolute; left:8%; right:8%; bottom:6px; height:0%;
+  border-radius:45% 55% 40% 50% / 60% 55% 40% 45%;
+  background:#f7ecd7; transition:height .5s, background .5s;
+}
+.bowl.wobble{animation:wob .45s ease;}
+@keyframes wob{0%{transform:rotate(0);}25%{transform:rotate(-6deg);}60%{transform:rotate(5deg);}100%{transform:rotate(0);}}
+.spoon{position:absolute; font-size:56px; top:-38px; right:6px; transform:rotate(20deg); transform-origin:bottom center; transition:transform .1s; pointer-events:none; z-index:2;}
+.spoon.stirring{animation:stir .5s ease;}
+@keyframes stir{0%{transform:rotate(20deg);}30%{transform:rotate(-30deg) translateX(-30px);}65%{transform:rotate(35deg) translateX(18px);}100%{transform:rotate(20deg);}}
+.mix-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; width:100%;}
+.ing-btn{
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  border:2px solid var(--line); border-radius:18px; background:var(--card);
+  padding:12px 6px; font-family:inherit; cursor:pointer; font-size:15px; font-weight:700; color:var(--ink);
+  box-shadow:0 3px 0 rgba(90,60,20,.12); position:relative;
+}
+.ing-btn:active{transform:translateY(2px);}
+.ing-btn .big{font-size:38px; line-height:1;}
+.ing-btn.added{opacity:.55; border-color:var(--accent);}
+.ing-btn.added::after{content:"✅"; position:absolute; top:-8px; right:-6px; font-size:20px;}
+.fly{position:fixed; z-index:60; font-size:36px; pointer-events:none; transition:transform .65s cubic-bezier(.4,-0.2,.6,1), opacity .65s; will-change:transform;}
+.dough-ball{
+  width:120px; height:110px; border-radius:48% 52% 50% 50%/58% 56% 44% 42%;
+  background:radial-gradient(circle at 35% 30%, #f4e2b8, #ddba7e);
+  display:none; align-items:center; justify-content:center; font-size:40px;
+  animation:bounceIn .6s ease;
+}
+.dough-ball.show{display:flex;}
+@keyframes bounceIn{0%{transform:scale(0);}60%{transform:scale(1.15);}100%{transform:scale(1);}}
+#mixMsg{min-height:24px; font-weight:700; font-size:18px; text-align:center;}
+/* canvas */
+.canvas-wrap{width:min(92vw,440px); aspect-ratio:1/1; position:relative; flex:none;}
+.canvas-wrap canvas{
+  width:100%; height:100%; display:block; border-radius:26px; touch-action:none;
+  background:radial-gradient(circle at 50% 46%, #ffffff 0%, #ffffff 62%, #fbe9cf 63%, #fff8ec 100%);
+  box-shadow:0 6px 0 rgba(90,60,20,.12);
+}
+.steamer{position:absolute; top:-6px; left:0; right:0; display:flex; justify-content:center; gap:26px; pointer-events:none;}
+.steam{width:16px; height:44px; border-radius:10px; background:rgba(255,255,255,.85); filter:blur(7px); animation:steamUp 2.2s ease-in infinite; opacity:0;}
+.steam:nth-child(2){animation-delay:.7s;}
+.steam:nth-child(3){animation-delay:1.3s;}
+@keyframes steamUp{0%{opacity:0; transform:translateY(18px) scaleX(1);}30%{opacity:.9;}100%{opacity:0; transform:translateY(-52px) scaleX(1.6);}}
+/* shape + toppings pickers */
+.chips{display:flex; gap:10px; overflow-x:auto; width:100%; padding:6px 2px 10px; scrollbar-width:none;}
+.chips::-webkit-scrollbar{display:none;}
+.chip{
+  flex:none; width:82px; display:flex; flex-direction:column; align-items:center; gap:2px;
+  border:3px solid var(--line); border-radius:18px; background:var(--card);
+  padding:10px 4px 8px; font-family:inherit; font-size:13px; font-weight:700; color:var(--ink); cursor:pointer;
+}
+.chip .big{font-size:32px; line-height:1.15;}
+.chip.sel{border-color:var(--brand); background:var(--soft); transform:scale(1.05);}
+.tools{display:flex; gap:10px; justify-content:center; width:100%;}
+.tools .btn{padding:10px 16px; min-height:48px; font-size:16px;}
+/* oven */
+.oven{width:min(80vw,330px); background:#6b5647; border-radius:26px; padding:16px 16px 12px; box-shadow:0 8px 0 rgba(60,40,20,.25);}
+.oven-top{display:flex; justify-content:center; gap:14px; margin-bottom:10px;}
+.knob{width:16px; height:16px; border-radius:50%; background:#c9b8a5; box-shadow:inset 0 -2px 0 rgba(0,0,0,.25);}
+.oven-window{background:#221a13; border:6px solid #4a3a2e; border-radius:16px; overflow:hidden; position:relative;}
+.oven-window canvas{width:100%; display:block;}
+.glow{position:absolute; inset:0; background:radial-gradient(circle at 50% 80%, rgba(255,150,40,.55), rgba(255,120,20,0) 70%); opacity:0; transition:opacity .8s; pointer-events:none;}
+.oven.hot .glow{opacity:1;}
+.oven-handle{height:10px; border-radius:8px; background:#c9b8a5; margin-top:12px;}
+.bake-progress{width:min(80vw,330px); height:16px; border-radius:10px; background:#f3e3cc; overflow:hidden;}
+.bake-progress div{height:100%; width:0%; background:linear-gradient(90deg,#ffb24d,#e07a2f); transition:width .2s linear; border-radius:10px;}
+/* gallery */
+.gal-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px; width:100%;}
+.ph{border:none; padding:0; background:none; cursor:pointer; display:flex; flex-direction:column; gap:4px; font-family:inherit;}
+.ph img{width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:18px; box-shadow:0 3px 0 rgba(90,60,20,.15);}
+.ph span{font-size:13px; color:var(--ink-soft); text-align:center;}
+.empty{text-align:center; color:var(--ink-soft); font-size:18px; padding:40px 10px;}
+/* modal */
+.modal{position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(60,40,20,.5); z-index:80; padding:20px;}
+.modal.open{display:flex;}
+.modal-card{background:#fff; border-radius:24px; padding:22px; max-width:420px; width:100%; display:flex; flex-direction:column; gap:14px; max-height:86vh; overflow:auto;}
+.modal-card h3{margin:0; font-size:22px; text-align:center;}
+.modal-card p{margin:0; font-size:17px; line-height:1.45;}
+.modal-card img{width:100%; border-radius:16px;}
+.ios-step{display:flex; align-items:center; gap:12px; background:var(--soft); border-radius:14px; padding:10px 14px; font-size:16px; font-weight:600;}
+.ios-step .n{flex:none; width:30px; height:30px; border-radius:50%; background:var(--brand); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800;}
+/* toast + fx */
+#toast{
+  position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom)); transform:translateX(-50%) translateY(20px);
+  background:var(--ink); color:#fff; padding:12px 22px; border-radius:16px; font-size:17px; font-weight:700;
+  opacity:0; transition:all .25s; z-index:90; pointer-events:none; white-space:nowrap;
+}
+#toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+.confetti{position:fixed; top:-20px; width:11px; height:15px; border-radius:3px; z-index:70; pointer-events:none; animation:confFall 2.3s ease-in forwards;}
+@keyframes confFall{to{transform:translate(var(--dx),108vh) rotate(740deg);}}
+.crumb{position:fixed; width:9px; height:9px; border-radius:50%; z-index:70; pointer-events:none; animation:crumbFall .8s ease-in forwards;}
+@keyframes crumbFall{to{transform:translate(var(--dx),130px); opacity:0;}}
+.celebrate{font-size:80px; animation:bounceIn .6s ease;}
+</style>
+</head>
+<body>
+<header>
+  <button class="icon-btn" id="backBtn" hidden aria-label="Back">←</button>
+  <div class="spacer48" id="backSpacer"></div>
+  <h1>🥨 Pretzel Party</h1>
+  <button class="icon-btn" id="soundBtn" aria-label="Sound on or off">🔊</button>
+</header>
+<div class="steps" id="steps" hidden>
+  <span class="step" data-s="0">🥣</span><span class="step" data-s="1">🥨</span><span class="step" data-s="2">🎨</span><span class="step" data-s="3">🔥</span><span class="step" data-s="4">😋</span>
+</div>
+<main>
+
+<section class="screen" id="scr-home">
+  <div class="hero">🥨</div>
+  <h2>Hi Amy!</h2>
+  <p class="sub">Let's make a yummy pretzel!</p>
+  <p class="count-line" id="countLine"></p>
+  <div class="home-btns">
+    <button class="btn btn-primary btn-big" id="startBtn">🥣 Make a pretzel!</button>
+    <button class="btn btn-soft" id="galleryBtn">📷 My pretzel photos</button>
+    <button class="btn btn-soft" id="installBtn" hidden>📲 Add to phone</button>
+  </div>
+</section>
+
+<section class="screen" id="scr-mix">
+  <h2>Mix the dough</h2>
+  <p class="sub" id="mixSub">Tap everything to put it in the bowl!</p>
+  <div class="bowl-zone">
+    <div class="dough-ball" id="doughBall">😊</div>
+    <button class="bowl-btn" id="bowlBtn" aria-label="Stir the bowl">
+      <div class="bowl" id="bowl">
+        <span class="spoon" id="spoon" hidden>🥄</span>
+        <div class="blob" id="blob"></div>
+      </div>
+    </button>
+  </div>
+  <p id="mixMsg"></p>
+  <div class="mix-grid" id="mixGrid"></div>
+</section>
+
+<section class="screen" id="scr-shape">
+  <h2>Pick a shape!</h2>
+  <p class="sub">Or draw your very own</p>
+  <div class="chips" id="shapeChips"></div>
+  <div class="canvas-wrap" id="slot-shape"></div>
+  <div class="tools" id="drawTools" hidden>
+    <button class="btn btn-soft" id="undoStroke">↩️ Undo</button>
+    <button class="btn btn-soft" id="clearStrokes">🧽 Wipe</button>
+  </div>
+  <button class="btn btn-go btn-big" id="shapeNext">Next: decorate! 🎨</button>
+</section>
+
+<section class="screen" id="scr-decorate">
+  <h2>Decorate it!</h2>
+  <p class="sub">Pick a topping, then tap your pretzel</p>
+  <div class="chips" id="topChips"></div>
+  <div class="canvas-wrap" id="slot-decorate"></div>
+  <div class="tools">
+    <button class="btn btn-soft" id="undoTop">↩️ Undo</button>
+    <button class="btn btn-soft" id="clearTops">🧽 Clean off</button>
+  </div>
+  <button class="btn btn-go btn-big" id="decorateNext">Next: bake it! 🔥</button>
+</section>
+
+<section class="screen" id="scr-bake">
+  <h2>Into the oven!</h2>
+  <p class="sub" id="bakeSub">Press the button to bake</p>
+  <div class="oven" id="oven">
+    <div class="oven-top"><span class="knob"></span><span class="knob"></span><span class="knob"></span></div>
+    <div class="oven-window">
+      <canvas id="ovenCanvas" width="300" height="300"></canvas>
+      <div class="glow"></div>
+    </div>
+    <div class="oven-handle"></div>
+  </div>
+  <div class="bake-progress"><div id="bakeBar"></div></div>
+  <button class="btn btn-primary btn-big" id="bakeBtn">🔥 Bake!</button>
+</section>
+
+<section class="screen" id="scr-ready">
+  <h2>Ta-daaa! 🎉</h2>
+  <p class="sub">Your pretzel is ready!</p>
+  <div class="canvas-wrap" id="slot-ready">
+    <div class="steamer"><span class="steam"></span><span class="steam"></span><span class="steam"></span></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-soft" id="savePhotoBtn">📸 Save photo</button>
+    <button class="btn btn-go" id="eatBtn">😋 Eat it!</button>
+  </div>
+</section>
+
+<section class="screen" id="scr-eat">
+  <h2>Munch munch!</h2>
+  <p class="sub">Tap the pretzel to take bites</p>
+  <div class="canvas-wrap" id="slot-eat"></div>
+  <button class="btn btn-soft" id="eatDone">All done!</button>
+</section>
+
+<section class="screen" id="scr-done">
+  <div class="celebrate" id="doneEmoji">🎉</div>
+  <h2 id="doneTitle">Yummy!</h2>
+  <p class="sub" id="doneSub">That was a great pretzel!</p>
+  <div class="home-btns">
+    <button class="btn btn-primary btn-big" id="againBtn">🥨 Make another!</button>
+    <button class="btn btn-soft" id="donePhotos">📷 My pretzel photos</button>
+  </div>
+</section>
+
+<section class="screen" id="scr-gallery">
+  <h2>My pretzel photos</h2>
+  <div class="gal-grid" id="galGrid"></div>
+  <div class="empty" id="galEmpty" hidden>No pretzel photos yet!<br>Bake a pretzel to make one 🥨</div>
+</section>
+
+</main>
+
+<div class="modal" id="restartModal">
+  <div class="modal-card">
+    <h3>Start over?</h3>
+    <p style="text-align:center">Your pretzel will disappear!</p>
+    <button class="btn btn-primary" id="restartNo">Keep making it 🥨</button>
+    <button class="btn btn-soft" id="restartYes">Start over</button>
+  </div>
+</div>
+
+<div class="modal" id="iosModal">
+  <div class="modal-card">
+    <h3>Add to your phone</h3>
+    <div class="ios-step"><span class="n">1</span><span>Tap the <b>Share</b> button <svg width="20" height="24" viewBox="0 0 20 24" style="vertical-align:middle"><path d="M10 1l4 4h-3v9h-2V5H6l4-4zM3 9h4v2H5v10h10V11h-2V9h4v14H3V9z" fill="#2b7de9"/></svg> in Safari</span></div>
+    <div class="ios-step"><span class="n">2</span><span>Scroll down and tap <b>Add to Home Screen</b> ➕</span></div>
+    <div class="ios-step"><span class="n">3</span><span>Tap <b>Add</b> — all done! 🎉</span></div>
+    <button class="btn btn-primary" id="iosClose">OK!</button>
+  </div>
+</div>
+
+<div class="modal" id="viewerModal">
+  <div class="modal-card">
+    <img id="viewerImg" alt="Saved pretzel">
+    <p class="sub" id="viewerDate"></p>
+    <div class="btn-row">
+      <a class="btn btn-soft" id="viewerDl" download>⬇️ Save</a>
+      <button class="btn btn-danger" id="viewerDel">🗑️ Delete</button>
+    </div>
+    <button class="btn btn-soft" id="viewerClose">Close</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+<script>
+/* ---------- helpers ---------- */
+var $ = function(s){ return document.querySelector(s); };
+function clamp(v,a,b){ return Math.min(b, Math.max(a, v)); }
+function rndFrom(seed){ var x = Math.sin(seed*9973.7)*10000; return x - Math.floor(x); }
+var SPRINKLE_COLORS = ['#ff5d8f','#22b8cf','#ffd43b','#845ef7','#51cf66','#ff922b'];
+
+/* ---------- audio (tiny synth, no files) ---------- */
+var AC = null;
+var soundOn = localStorage.getItem('pz-sound') !== 'off';
+function ac(){
+  if(!soundOn) return null;
+  try{
+    if(!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+    if(AC.state === 'suspended') AC.resume();
+    return AC;
+  }catch(e){ return null; }
+}
+function tone(freq,dur,type,vol,slide){
+  var c = ac(); if(!c) return;
+  var o = c.createOscillator(), g = c.createGain();
+  o.type = type || 'sine';
+  o.frequency.setValueAtTime(freq, c.currentTime);
+  if(slide) o.frequency.exponentialRampToValueAtTime(slide, c.currentTime + dur);
+  g.gain.setValueAtTime(vol || 0.15, c.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + dur);
+  o.connect(g); g.connect(c.destination);
+  o.start(); o.stop(c.currentTime + dur + 0.05);
+}
+function noiseBurst(dur,vol,freq,type){
+  var c = ac(); if(!c) return;
+  var n = Math.floor(c.sampleRate * dur);
+  var buf = c.createBuffer(1, n, c.sampleRate);
+  var d = buf.getChannelData(0);
+  for(var i=0;i<n;i++) d[i] = (Math.random()*2-1) * (1 - i/n);
+  var src = c.createBufferSource(); src.buffer = buf;
+  var f = c.createBiquadFilter(); f.type = type || 'lowpass'; f.frequency.value = freq || 1500;
+  var g = c.createGain(); g.gain.value = vol || 0.25;
+  src.connect(f); f.connect(g); g.connect(c.destination);
+  src.start();
+}
+var snd = {
+  pop: function(){ tone(420,0.12,'sine',0.2,880); },
+  plop: function(){ tone(320,0.16,'sine',0.25,120); },
+  blip: function(){ tone(660,0.08,'triangle',0.12,990); },
+  shake: function(){ noiseBurst(0.06,0.12,4000,'highpass'); },
+  swish: function(){ noiseBurst(0.18,0.1,900,'lowpass'); },
+  crunch: function(){ noiseBurst(0.16,0.4,1100,'lowpass'); tone(160,0.1,'square',0.05,80); },
+  sizzle: function(){ noiseBurst(0.6,0.05,6000,'highpass'); },
+  ding: function(){ tone(1319,0.7,'triangle',0.18); setTimeout(function(){ tone(1760,0.9,'triangle',0.16); },130); },
+  tada: function(){ [523,659,784,1047].forEach(function(f,i){ setTimeout(function(){ tone(f,0.35,'triangle',0.16); }, i*110); }); }
+};
+$('#soundBtn').textContent = soundOn ? '🔊' : '🔇';
+$('#soundBtn').addEventListener('click', function(){
+  soundOn = !soundOn;
+  localStorage.setItem('pz-sound', soundOn ? 'on' : 'off');
+  $('#soundBtn').textContent = soundOn ? '🔊' : '🔇';
+  if(soundOn) snd.blip();
+});
+
+/* ---------- pretzel state ---------- */
+var S = null;
+var batchCounter = 0, doughHit = null, eatInitial = 0, topSel = 'salt', drawMode = false;
+function resetPretzel(){
+  S = { strokes:[], toppings:[], bites:[], bake:0, saved:false };
+  batchCounter = 0; doughHit = null; eatInitial = 0; drawMode = false;
+}
+resetPretzel();
+
+/* ---------- shapes (logical 1000x1000 space) ---------- */
+function ptsFromFn(fn,n,t0,t1){
+  var pts = [];
+  for(var i=0;i<=n;i++){ var t = t0 + (t1-t0)*i/n; pts.push(fn(t)); }
+  return pts;
+}
+var PRESETS = {
+  pretzel: function(){
+    return [ ptsFromFn(function(t){
+      var x = Math.sin(t) + 2*Math.sin(2*t);
+      var y = Math.cos(t) - 2*Math.cos(2*t);
+      return { x: 500 + x*132, y: 495 + y*115 };
+    }, 170, 0, Math.PI*2) ];
+  },
+  heart: function(){
+    return [ ptsFromFn(function(t){
+      var x = 16*Math.pow(Math.sin(t),3);
+      var y = 13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t);
+      return { x: 500 + x*19, y: 470 - y*19 };
+    }, 150, 0, Math.PI*2) ];
+  },
+  star: function(){
+    var pts = [];
+    for(var i=0;i<=10;i++){
+      var ang = -Math.PI/2 + i*Math.PI/5;
+      var r = (i%2===0) ? 295 : 135;
+      pts.push({ x: 500 + Math.cos(ang)*r, y: 525 + Math.sin(ang)*r });
+    }
+    return [pts];
+  },
+  ring: function(){
+    return [ ptsFromFn(function(t){
+      return { x: 500 + Math.cos(t)*255, y: 500 + Math.sin(t)*255 };
+    }, 120, 0, Math.PI*2) ];
+  },
+  worm: function(){
+    return [ ptsFromFn(function(t){
+      return { x: 215 + t*570, y: 500 + Math.sin(t*Math.PI*2.5)*135 };
+    }, 90, 0, 1) ];
+  },
+  letterA: function(){
+    return [
+      [{x:355,y:765},{x:500,y:270}],
+      [{x:500,y:270},{x:645,y:765}],
+      [{x:410,y:585},{x:590,y:585}]
+    ];
+  }
+};
+var SHAPES = [
+  { k:'pretzel', e:'🥨', n:'Pretzel' },
+  { k:'heart',   e:'❤️', n:'Heart' },
+  { k:'star',    e:'⭐', n:'Star' },
+  { k:'ring',    e:'🍩', n:'Ring' },
+  { k:'worm',    e:'🐛', n:'Worm' },
+  { k:'letterA', e:'🅰️', n:'A for Amy' },
+  { k:'draw',    e:'✏️', n:'Draw!' }
+];
+
+/* ---------- drawing ---------- */
+var ROPE = 64;
+var mainC = document.createElement('canvas');
+mainC.width = 1000; mainC.height = 1000;
+var mainCtx = mainC.getContext('2d');
+var hitC = document.createElement('canvas'); hitC.width = 1000; hitC.height = 1000;
+var measC = document.createElement('canvas'); measC.width = 200; measC.height = 200;
+
+function pathThrough(ctx, pts){
+  if(!pts.length) return;
+  ctx.moveTo(pts[0].x, pts[0].y);
+  if(pts.length === 1){ ctx.lineTo(pts[0].x + 0.1, pts[0].y); return; }
+  for(var i=1;i<pts.length-1;i++){
+    var mx = (pts[i].x + pts[i+1].x)/2, my = (pts[i].y + pts[i+1].y)/2;
+    ctx.quadraticCurveTo(pts[i].x, pts[i].y, mx, my);
+  }
+  var last = pts[pts.length-1];
+  ctx.lineTo(last.x, last.y);
+}
+function mixC2(c1,c2,t){ return [0,1,2].map(function(i){ return Math.round(c1[i] + (c2[i]-c1[i])*t); }); }
+function rgbStr(c){ return 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')'; }
+function doughPalette(p){
+  var raw = [238,216,170], gold = [186,115,46], dark = [120,66,28], base;
+  if(p <= 1) base = mixC2(raw, gold, p);
+  else base = mixC2(gold, dark, Math.min(1,(p-1)*2));
+  return {
+    base: rgbStr(base),
+    edge: rgbStr(mixC2(base,[60,30,10],0.35)),
+    hi:   rgbStr(mixC2(base,[255,244,220],0.4))
+  };
+}
+function strokeAllPaths(ctx){
+  ctx.beginPath();
+  for(var i=0;i<S.strokes.length;i++){ if(S.strokes[i].length) pathThrough(ctx, S.strokes[i]); }
+  ctx.stroke();
+}
+function drawDough(ctx, p){
+  if(p === undefined) p = S.bake;
+  var pal = doughPalette(p);
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  var passes = [
+    [pal.edge, ROPE+12, 1, 0],
+    [pal.base, ROPE, 1, 0],
+    [pal.hi, ROPE*0.38, 0.5, -7]
+  ];
+  for(var i=0;i<passes.length;i++){
+    var ps = passes[i];
+    ctx.save();
+    ctx.translate(0, ps[3]);
+    ctx.globalAlpha = ps[2];
+    ctx.strokeStyle = ps[0];
+    ctx.lineWidth = ps[1];
+    strokeAllPaths(ctx);
+    ctx.restore();
+  }
+}
+function roundRectPath(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+function drawToppings(ctx){
+  for(var i=0;i<S.toppings.length;i++){
+    var t = S.toppings[i];
+    ctx.save();
+    ctx.translate(t.x, t.y);
+    ctx.rotate(t.rot);
+    if(t.type === 'salt'){
+      ctx.fillStyle = 'rgba(255,255,255,0.95)';
+      ctx.strokeStyle = 'rgba(150,150,165,0.7)';
+      ctx.lineWidth = 2;
+      roundRectPath(ctx,-8,-8,16,16,5);
+      ctx.fill(); ctx.stroke();
+    } else if(t.type === 'sesame'){
+      ctx.fillStyle = '#f3e5b5';
+      ctx.strokeStyle = '#c8a96a';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.ellipse(0,0,10,6,0,0,Math.PI*2);
+      ctx.fill(); ctx.stroke();
+    } else if(t.type === 'sprinkle'){
+      ctx.fillStyle = SPRINKLE_COLORS[t.v % SPRINKLE_COLORS.length];
+      roundRectPath(ctx,-13,-4.5,26,9,4.5);
+      ctx.fill();
+    } else if(t.type === 'cinnamon'){
+      ctx.globalAlpha = 0.4;
+      ctx.fillStyle = '#8a5a2b';
+      ctx.beginPath();
+      ctx.arc(0,0,10 + 7*rndFrom(t.seed),0,Math.PI*2);
+      ctx.fill();
+    } else if(t.type === 'choc'){
+      ctx.strokeStyle = '#4b2e1a';
+      ctx.lineWidth = 9;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-24,0);
+      ctx.quadraticCurveTo(-12,-11,0,0);
+      ctx.quadraticCurveTo(12,11,24,0);
+      ctx.stroke();
+    } else if(t.type === 'eyes'){
+      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = '#cfc4ae';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(0,0,16,0,Math.PI*2);
+      ctx.fill(); ctx.stroke();
+      var a = rndFrom(t.seed)*Math.PI*2;
+      ctx.fillStyle = '#26221c';
+      ctx.beginPath();
+      ctx.arc(Math.cos(a)*4.5, Math.sin(a)*4.5, 7, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+}
+function punchBites(ctx){
+  if(!S.bites.length) return;
+  ctx.save();
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.beginPath();
+  for(var i=0;i<S.bites.length;i++){
+    var b = S.bites[i];
+    ctx.moveTo(b.x + b.r, b.y);
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
+    for(var j=0;j<b.sc.length;j++){
+      var o = b.sc[j];
+      ctx.moveTo(b.x + o[0] + o[2], b.y + o[1]);
+      ctx.arc(b.x + o[0], b.y + o[1], o[2], 0, Math.PI*2);
+    }
+  }
+  ctx.fill();
+  ctx.restore();
+}
+function render(){
+  mainCtx.clearRect(0,0,1000,1000);
+  drawDough(mainCtx);
+  drawToppings(mainCtx);
+  punchBites(mainCtx);
+}
+function computeDoughHit(){
+  var h = hitC.getContext('2d', { willReadFrequently:true });
+  h.clearRect(0,0,1000,1000);
+  h.lineCap = 'round'; h.lineJoin = 'round';
+  h.strokeStyle = '#000'; h.lineWidth = ROPE + 16;
+  strokeAllPaths(h);
+  doughHit = h.getImageData(0,0,1000,1000).data;
+}
+function onDough(x,y){
+  if(!doughHit) return false;
+  x = Math.round(x); y = Math.round(y);
+  if(x<0||y<0||x>999||y>999) return false;
+  return doughHit[(y*1000+x)*4+3] > 10;
+}
+function onDoughNear(x,y){
+  return onDough(x,y) || onDough(x+34,y) || onDough(x-34,y) || onDough(x,y+34) || onDough(x,y-34);
+}
+function measureRemaining(){
+  var m = measC.getContext('2d', { willReadFrequently:true });
+  m.clearRect(0,0,200,200);
+  m.save();
+  m.scale(0.2,0.2);
+  m.lineCap = 'round'; m.lineJoin = 'round';
+  m.strokeStyle = '#000'; m.lineWidth = ROPE;
+  strokeAllPaths(m);
+  m.globalCompositeOperation = 'destination-out';
+  m.beginPath();
+  for(var i=0;i<S.bites.length;i++){
+    var b = S.bites[i];
+    m.moveTo(b.x + b.r, b.y);
+    m.arc(b.x, b.y, b.r, 0, Math.PI*2);
+    for(var j=0;j<b.sc.length;j++){
+      var o = b.sc[j];
+      m.moveTo(b.x + o[0] + o[2], b.y + o[1]);
+      m.arc(b.x + o[0], b.y + o[1], o[2], 0, Math.PI*2);
+    }
+  }
+  m.fill();
+  m.restore();
+  var d = m.getImageData(0,0,200,200).data;
+  var c = 0;
+  for(var k=3;k<d.length;k+=4){ if(d[k] > 10) c++; }
+  return c;
+}
+
+/* ---------- canvas mounting + pointer input ---------- */
+var SLOTS = { shape:'slot-shape', decorate:'slot-decorate', ready:'slot-ready', eat:'slot-eat' };
+function mountCanvasFor(id){
+  var slotId = SLOTS[id];
+  if(!slotId) return;
+  var slot = document.getElementById(slotId);
+  slot.insertBefore(mainC, slot.firstChild);
+}
+function evtToLogical(e){
+  var r = mainC.getBoundingClientRect();
+  return {
+    x: clamp((e.clientX - r.left)/r.width*1000, 0, 999),
+    y: clamp((e.clientY - r.top)/r.height*1000, 0, 999)
+  };
+}
+var pointerDown = false, curStroke = null, lastSprinkle = 0;
+mainC.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+mainC.addEventListener('pointerdown', function(e){
+  e.preventDefault();
+  pointerDown = true;
+  try{ mainC.setPointerCapture(e.pointerId); }catch(err){}
+  var p = evtToLogical(e);
+  if(current === 'shape' && drawMode){
+    curStroke = [p];
+    S.strokes.push(curStroke);
+    render();
+  } else if(current === 'decorate'){
+    batchCounter++;
+    addToppingsAt(p.x, p.y);
+  } else if(current === 'eat'){
+    doBite(p.x, p.y);
+  }
+});
+mainC.addEventListener('pointermove', function(e){
+  if(!pointerDown) return;
+  var p = evtToLogical(e);
+  if(current === 'shape' && drawMode && curStroke){
+    var lp = curStroke[curStroke.length-1];
+    var dx = p.x-lp.x, dy = p.y-lp.y;
+    if(dx*dx + dy*dy > 64){ curStroke.push(p); render(); }
+  } else if(current === 'decorate'){
+    var now = Date.now();
+    if(now - lastSprinkle > 60){ lastSprinkle = now; addToppingsAt(p.x, p.y); }
+  }
+});
+function endStroke(){
+  if(curStroke && curStroke.length === 1){ curStroke.push({x:curStroke[0].x+0.5, y:curStroke[0].y}); render(); }
+  curStroke = null;
+  pointerDown = false;
+  if(current === 'shape') updateShapeNext();
+}
+mainC.addEventListener('pointerup', endStroke);
+mainC.addEventListener('pointercancel', endStroke);
+
+/* ---------- screens / navigation ---------- */
+var SCREEN_IDS = ['home','mix','shape','decorate','bake','ready','eat','done','gallery'];
+var STEP_OF = { mix:0, shape:1, decorate:2, bake:3, ready:4, eat:4 };
+var current = 'home';
+function show(id){
+  current = id;
+  SCREEN_IDS.forEach(function(s){
+    document.getElementById('scr-'+s).classList.toggle('active', s === id);
+  });
+  var making = STEP_OF[id] !== undefined;
+  $('#steps').hidden = !making;
+  if(making){
+    document.querySelectorAll('.step').forEach(function(el){
+      el.classList.toggle('on', Number(el.dataset.s) === STEP_OF[id]);
+    });
+  }
+  var showBack = id !== 'home';
+  $('#backBtn').hidden = !showBack;
+  $('#backSpacer').style.display = showBack ? 'none' : 'block';
+  mountCanvasFor(id);
+  onEnter(id);
+  window.scrollTo(0,0);
+}
+function onEnter(id){
+  if(id === 'home'){ updateCountLine(); updateInstallBtn(); }
+  if(id === 'shape'){
+    if(!S.strokes.length && !drawMode){ selectShape('pretzel'); }
+    render();
+    updateShapeNext();
+  }
+  if(id === 'decorate'){ computeDoughHit(); render(); }
+  if(id === 'bake'){
+    render();
+    renderOven();
+    $('#bakeBtn').disabled = false;
+    $('#bakeBar').style.width = '0%';
+    $('#bakeSub').textContent = 'Press the button to bake';
+    $('#oven').classList.remove('hot');
+  }
+  if(id === 'ready'){ S.bake = 1; render(); }
+  if(id === 'eat'){
+    S.bites = [];
+    computeDoughHit();
+    render();
+    eatInitial = measureRemaining();
+  }
+  if(id === 'gallery'){ renderGallery(); }
+}
+$('#backBtn').addEventListener('click', function(){
+  if(current === 'gallery' || current === 'done'){ show('home'); return; }
+  $('#restartModal').classList.add('open');
+});
+$('#restartNo').addEventListener('click', function(){ $('#restartModal').classList.remove('open'); });
+$('#restartYes').addEventListener('click', function(){
+  $('#restartModal').classList.remove('open');
+  resetPretzel(); resetMix();
+  show('home');
+});
+$('#startBtn').addEventListener('click', function(){
+  ac(); snd.pop();
+  resetPretzel(); resetMix();
+  show('mix');
+});
+$('#galleryBtn').addEventListener('click', function(){ show('gallery'); });
+
+/* ---------- mix screen ---------- */
+var INGREDIENTS = [
+  { e:'🌾', n:'Flour' },
+  { e:'💧', n:'Warm water' },
+  { e:'✨', n:'Yeast' },
+  { e:'🍁', n:'Maple syrup' },
+  { e:'🧂', n:'Salt' },
+  { e:'🫒', n:'Oil' }
+];
+var added = 0, stirs = 0, mixDone = false;
+var mixGrid = $('#mixGrid');
+INGREDIENTS.forEach(function(ing, idx){
+  var b = document.createElement('button');
+  b.className = 'ing-btn';
+  b.innerHTML = '<span class="big">' + ing.e + '</span><span>' + ing.n + '</span>';
+  b.addEventListener('click', function(){ addIngredient(idx, b, ing); });
+  mixGrid.appendChild(b);
+});
+function resetMix(){
+  added = 0; stirs = 0; mixDone = false;
+  document.querySelectorAll('.ing-btn').forEach(function(b){ b.classList.remove('added'); });
+  $('#blob').style.height = '0%';
+  $('#blob').style.background = '#f7ecd7';
+  $('#spoon').hidden = true;
+  $('#doughBall').classList.remove('show');
+  $('#mixMsg').textContent = '';
+  $('#mixSub').textContent = 'Tap everything to put it in the bowl!';
+  $('#mixGrid').style.display = 'grid';
+}
+function addIngredient(idx, btn, ing){
+  if(btn.classList.contains('added') || mixDone) return;
+  ac();
+  btn.classList.add('added');
+  added++;
+  var br = btn.getBoundingClientRect();
+  var bowlR = $('#bowl').getBoundingClientRect();
+  var fly = document.createElement('span');
+  fly.className = 'fly';
+  fly.textContent = ing.e;
+  fly.style.left = (br.left + br.width/2 - 18) + 'px';
+  fly.style.top = (br.top + 6) + 'px';
+  document.body.appendChild(fly);
+  var dx = (bowlR.left + bowlR.width/2 - 18) - (br.left + br.width/2 - 18);
+  var dy = (bowlR.top + 20) - (br.top + 6);
+  requestAnimationFrame(function(){
+    fly.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(.5) rotate(220deg)';
+    fly.style.opacity = '0.2';
+  });
+  setTimeout(function(){
+    fly.remove();
+    snd.plop();
+    var bowl = $('#bowl');
+    bowl.classList.remove('wobble');
+    void bowl.offsetWidth;
+    bowl.classList.add('wobble');
+    var pct = Math.min(84, added*14);
+    $('#blob').style.height = pct + '%';
+    var t = added/6;
+    $('#blob').style.background = 'rgb(' + Math.round(247-15*t) + ',' + Math.round(236-26*t) + ',' + Math.round(215-48*t) + ')';
+    if(added >= INGREDIENTS.length) startStirPhase();
+  }, 620);
+}
+function startStirPhase(){
+  $('#mixSub').textContent = 'Everything is in!';
+  $('#mixMsg').textContent = '👉 Tap the bowl to stir!';
+  $('#mixGrid').style.display = 'none';
+  $('#spoon').hidden = false;
+}
+$('#bowlBtn').addEventListener('click', function(){
+  if(added < INGREDIENTS.length || mixDone) return;
+  ac();
+  stirs++;
+  snd.swish();
+  var sp = $('#spoon');
+  sp.classList.remove('stirring');
+  void sp.offsetWidth;
+  sp.classList.add('stirring');
+  var blob = $('#blob');
+  blob.style.borderRadius = (40+Math.random()*20) + '% ' + (40+Math.random()*20) + '% 45% 50% / 55% ' + (40+Math.random()*20) + '% 45% 50%';
+  var left = 6 - stirs;
+  if(left > 0){
+    $('#mixMsg').textContent = 'Stir stir stir! ' + '🌀'.repeat(Math.min(stirs,6));
+  } else {
+    mixDone = true;
+    $('#spoon').hidden = true;
+    $('#blob').style.height = '0%';
+    $('#doughBall').classList.add('show');
+    $('#mixMsg').textContent = 'The dough is ready! 🎉';
+    snd.tada();
+    setTimeout(function(){ show('shape'); }, 1400);
+  }
+});
+
+/* ---------- shape screen ---------- */
+var shapeChips = $('#shapeChips');
+SHAPES.forEach(function(sh){
+  var b = document.createElement('button');
+  b.className = 'chip';
+  b.dataset.k = sh.k;
+  b.innerHTML = '<span class="big">' + sh.e + '</span><span>' + sh.n + '</span>';
+  b.addEventListener('click', function(){ ac(); snd.blip(); selectShape(sh.k); });
+  shapeChips.appendChild(b);
+});
+function selectShape(k){
+  document.querySelectorAll('#shapeChips .chip').forEach(function(c){
+    c.classList.toggle('sel', c.dataset.k === k);
+  });
+  S.toppings = []; S.bites = [];
+  if(k === 'draw'){
+    drawMode = true;
+    S.strokes = [];
+    $('#drawTools').hidden = false;
+    $('#shapeNext').textContent = 'Draw with your finger! ✏️';
+  } else {
+    drawMode = false;
+    S.strokes = PRESETS[k]();
+    $('#drawTools').hidden = true;
+  }
+  render();
+  updateShapeNext();
+}
+function updateShapeNext(){
+  var ok = S.strokes.length > 0;
+  $('#shapeNext').disabled = !ok;
+  if(ok) $('#shapeNext').textContent = 'Next: decorate! 🎨';
+}
+$('#undoStroke').addEventListener('click', function(){
+  S.strokes.pop(); render(); updateShapeNext();
+});
+$('#clearStrokes').addEventListener('click', function(){
+  S.strokes = []; render(); updateShapeNext();
+});
+$('#shapeNext').addEventListener('click', function(){ snd.pop(); show('decorate'); });
+
+/* ---------- decorate screen ---------- */
+var TOPPINGS = [
+  { k:'salt',     e:'🧂', n:'Salt' },
+  { k:'sprinkle', e:'🌈', n:'Sprinkles' },
+  { k:'choc',     e:'🍫', n:'Chocolate' },
+  { k:'cinnamon', e:'🤎', n:'Cinnamon' },
+  { k:'sesame',   e:'🟡', n:'Sesame' },
+  { k:'eyes',     e:'👀', n:'Eyes' }
+];
+var topChips = $('#topChips');
+TOPPINGS.forEach(function(tp){
+  var b = document.createElement('button');
+  b.className = 'chip' + (tp.k === 'salt' ? ' sel' : '');
+  b.dataset.k = tp.k;
+  b.innerHTML = '<span class="big">' + tp.e + '</span><span>' + tp.n + '</span>';
+  b.addEventListener('click', function(){
+    ac(); snd.blip();
+    topSel = tp.k;
+    document.querySelectorAll('#topChips .chip').forEach(function(c){
+      c.classList.toggle('sel', c.dataset.k === tp.k);
+    });
+  });
+  topChips.appendChild(b);
+});
+function addToppingsAt(x,y){
+  var n = (topSel === 'eyes' || topSel === 'choc') ? 1 : 3;
+  var addedAny = false;
+  for(var i=0;i<n;i++){
+    var jx = x, jy = y;
+    if(n > 1){ jx += Math.random()*56-28; jy += Math.random()*56-28; }
+    if(!onDough(jx,jy)) continue;
+    S.toppings.push({
+      x:jx, y:jy, type:topSel,
+      rot: topSel === 'eyes' ? 0 : Math.random()*Math.PI*2,
+      seed: Math.random()*1000,
+      v: Math.floor(Math.random()*SPRINKLE_COLORS.length),
+      batch: batchCounter
+    });
+    addedAny = true;
+  }
+  if(addedAny){ snd.shake(); render(); }
+}
+$('#undoTop').addEventListener('click', function(){
+  if(!S.toppings.length) return;
+  var last = S.toppings[S.toppings.length-1].batch;
+  S.toppings = S.toppings.filter(function(t){ return t.batch !== last; });
+  render();
+});
+$('#clearTops').addEventListener('click', function(){ S.toppings = []; render(); });
+$('#decorateNext').addEventListener('click', function(){ snd.pop(); show('bake'); });
+
+/* ---------- bake screen ---------- */
+var ovenCtx = $('#ovenCanvas').getContext('2d');
+var baking = false;
+function renderOven(){
+  ovenCtx.clearRect(0,0,300,300);
+  ovenCtx.drawImage(mainC, 0, 0, 300, 300);
+}
+$('#bakeBtn').addEventListener('click', function(){
+  if(baking) return;
+  baking = true;
+  ac();
+  $('#bakeBtn').disabled = true;
+  $('#bakeSub').textContent = 'Baking... watch it turn golden!';
+  $('#oven').classList.add('hot');
+  snd.sizzle();
+  var sizz = setInterval(function(){ snd.sizzle(); }, 1200);
+  var dur = 6000, t0 = performance.now();
+  function tick(now){
+    var p = clamp((now - t0)/dur, 0, 1);
+    S.bake = p;
+    render();
+    renderOven();
+    $('#bakeBar').style.width = (p*100) + '%';
+    if(p < 1){ requestAnimationFrame(tick); }
+    else {
+      clearInterval(sizz);
+      baking = false;
+      bakeDone();
+    }
+  }
+  requestAnimationFrame(tick);
+});
+function bakeDone(){
+  snd.ding();
+  $('#bakeSub').textContent = 'DING! It\'s ready! 🔔';
+  $('#oven').classList.remove('hot');
+  confetti(28);
+  var n = Number(localStorage.getItem('pz-count') || '0') + 1;
+  localStorage.setItem('pz-count', String(n));
+  setTimeout(function(){ show('ready'); snd.tada(); }, 1100);
+}
+
+/* ---------- ready screen (save photo) ---------- */
+var idbPromise = null;
+function db(){
+  if(!idbPromise){
+    idbPromise = new Promise(function(res, rej){
+      var r = indexedDB.open('pretzel-db', 1);
+      r.onupgradeneeded = function(){ r.result.createObjectStore('photos', { keyPath:'id' }); };
+      r.onsuccess = function(){ res(r.result); };
+      r.onerror = function(){ rej(r.error); };
+    });
+  }
+  return idbPromise;
+}
+function idbPut(o){
+  return db().then(function(d){
+    return new Promise(function(res, rej){
+      var tx = d.transaction('photos','readwrite');
+      tx.objectStore('photos').put(o);
+      tx.oncomplete = res;
+      tx.onerror = function(){ rej(tx.error); };
+    });
+  });
+}
+function idbAll(){
+  return db().then(function(d){
+    return new Promise(function(res, rej){
+      var rq = d.transaction('photos').objectStore('photos').getAll();
+      rq.onsuccess = function(){ res(rq.result || []); };
+      rq.onerror = function(){ rej(rq.error); };
+    });
+  });
+}
+function idbDel(id){
+  return db().then(function(d){
+    return new Promise(function(res, rej){
+      var tx = d.transaction('photos','readwrite');
+      tx.objectStore('photos')['delete'](id);
+      tx.oncomplete = res;
+      tx.onerror = function(){ rej(tx.error); };
+    });
+  });
+}
+function savePhoto(auto){
+  if(S.saved && auto) return Promise.resolve();
+  var c = document.createElement('canvas');
+  c.width = 1000; c.height = 1000;
+  var x = c.getContext('2d');
+  x.fillStyle = '#ffedd5';
+  x.fillRect(0,0,1000,1000);
+  x.fillStyle = '#ffffff';
+  x.beginPath(); x.arc(500,510,462,0,Math.PI*2); x.fill();
+  x.strokeStyle = '#f1dfc4'; x.lineWidth = 14;
+  x.beginPath(); x.arc(500,510,455,0,Math.PI*2); x.stroke();
+  drawDough(x, 1);
+  drawToppings(x);
+  return new Promise(function(res){ c.toBlob(res, 'image/jpeg', 0.86); }).then(function(blob){
+    if(!blob) throw new Error('no blob');
+    var ts = Date.now();
+    return idbPut({ id: ts, ts: ts, blob: blob });
+  }).then(function(){
+    S.saved = true;
+    if(!auto){ toast('Photo saved! 📸'); snd.pop(); }
+  })['catch'](function(){
+    if(!auto) toast('Oh no, could not save 😢');
+  });
+}
+$('#savePhotoBtn').addEventListener('click', function(){ savePhoto(false); });
+$('#eatBtn').addEventListener('click', function(){
+  snd.pop();
+  savePhoto(true);
+  show('eat');
+});
+
+/* ---------- eat screen ---------- */
+function doBite(x,y){
+  if(!onDoughNear(x,y)){ snd.blip(); return; }
+  var r = 55 + Math.random()*25;
+  var sc = [];
+  for(var i=0;i<3;i++){
+    var a = Math.random()*Math.PI*2;
+    sc.push([Math.cos(a)*r*0.8, Math.sin(a)*r*0.8, r*0.45 + Math.random()*r*0.2]);
+  }
+  S.bites.push({ x:x, y:y, r:r, sc:sc });
+  snd.crunch();
+  crumbsAt(x,y);
+  render();
+  var rem = measureRemaining();
+  if(eatInitial && rem/eatInitial < 0.1){
+    setTimeout(function(){ finishEat(true); }, 450);
+  }
+}
+function crumbsAt(lx,ly){
+  var r = mainC.getBoundingClientRect();
+  var cx = r.left + lx/1000*r.width;
+  var cy = r.top + ly/1000*r.height;
+  for(var i=0;i<6;i++){
+    var s = document.createElement('span');
+    s.className = 'crumb';
+    s.style.left = (cx + Math.random()*30-15) + 'px';
+    s.style.top = (cy + Math.random()*20-10) + 'px';
+    s.style.background = ['#b06a2c','#8a5a2b','#d9a05e'][i%3];
+    s.style.setProperty('--dx', (Math.random()*80-40) + 'px');
+    document.body.appendChild(s);
+    setTimeout(function(){ s.remove(); }, 850);
+  }
+}
+var finishing = false;
+function finishEat(ateAll){
+  if(finishing) return;
+  finishing = true;
+  snd.tada();
+  confetti(36);
+  $('#doneEmoji').textContent = ateAll ? '😋' : '🎉';
+  $('#doneTitle').textContent = ateAll ? 'You ate it ALL!' : 'Yummy!';
+  $('#doneSub').textContent = ateAll ? 'That must have been delicious!' : 'That was a great pretzel!';
+  setTimeout(function(){ show('done'); finishing = false; }, 300);
+}
+$('#eatDone').addEventListener('click', function(){ finishEat(false); });
+$('#againBtn').addEventListener('click', function(){
+  snd.pop();
+  resetPretzel(); resetMix();
+  show('mix');
+});
+$('#donePhotos').addEventListener('click', function(){ show('gallery'); });
+
+/* ---------- gallery ---------- */
+var galUrls = [];
+function renderGallery(){
+  galUrls.forEach(function(u){ URL.revokeObjectURL(u); });
+  galUrls = [];
+  var grid = $('#galGrid');
+  grid.innerHTML = '';
+  idbAll().then(function(items){
+    items.sort(function(a,b){ return b.ts - a.ts; });
+    $('#galEmpty').hidden = items.length > 0;
+    items.forEach(function(it){
+      var url = URL.createObjectURL(it.blob);
+      galUrls.push(url);
+      var b = document.createElement('button');
+      b.className = 'ph';
+      var img = document.createElement('img');
+      img.src = url;
+      img.alt = 'Pretzel photo';
+      var lab = document.createElement('span');
+      lab.textContent = new Date(it.ts).toLocaleDateString();
+      b.appendChild(img);
+      b.appendChild(lab);
+      b.addEventListener('click', function(){ openViewer(it, url); });
+      grid.appendChild(b);
+    });
+  })['catch'](function(){
+    $('#galEmpty').hidden = false;
+  });
+}
+var viewerItem = null, delArmed = false, delTimer = null;
+function openViewer(it, url){
+  viewerItem = it;
+  $('#viewerImg').src = url;
+  $('#viewerDate').textContent = new Date(it.ts).toLocaleDateString(undefined, { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  var d = new Date(it.ts);
+  var pad = function(n){ return (n<10?'0':'')+n; };
+  $('#viewerDl').href = url;
+  $('#viewerDl').setAttribute('download', 'pretzel-' + d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + '.jpg');
+  resetDelBtn();
+  $('#viewerModal').classList.add('open');
+}
+function resetDelBtn(){
+  delArmed = false;
+  clearTimeout(delTimer);
+  $('#viewerDel').textContent = '🗑️ Delete';
+}
+$('#viewerDel').addEventListener('click', function(){
+  if(!delArmed){
+    delArmed = true;
+    $('#viewerDel').textContent = 'Tap again to delete!';
+    delTimer = setTimeout(resetDelBtn, 3000);
+    return;
+  }
+  var id = viewerItem.id;
+  idbDel(id).then(function(){
+    $('#viewerModal').classList.remove('open');
+    toast('Photo deleted');
+    renderGallery();
+  });
+});
+$('#viewerClose').addEventListener('click', function(){ $('#viewerModal').classList.remove('open'); });
+
+/* ---------- toast / confetti ---------- */
+var toastTimer = null;
+function toast(msg){
+  var t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2200);
+}
+function confetti(n){
+  for(var i=0;i<n;i++){
+    var s = document.createElement('span');
+    s.className = 'confetti';
+    s.style.left = (Math.random()*100) + 'vw';
+    s.style.background = SPRINKLE_COLORS[i % SPRINKLE_COLORS.length];
+    s.style.animationDelay = (Math.random()*0.5) + 's';
+    s.style.setProperty('--dx', (Math.random()*180-90) + 'px');
+    document.body.appendChild(s);
+    (function(el){ setTimeout(function(){ el.remove(); }, 3200); })(s);
+  }
+}
+function updateCountLine(){
+  var n = Number(localStorage.getItem('pz-count') || '0');
+  $('#countLine').textContent = n > 0 ? ('You have baked ' + n + ' pretzel' + (n===1?'':'s') + '! 🥨') : '';
+}
+
+/* ---------- install ---------- */
+var deferredPrompt = null;
+var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+function isStandalone(){
+  return (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+}
+function updateInstallBtn(){
+  $('#installBtn').hidden = isStandalone() || !(deferredPrompt || isIOS);
+}
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  deferredPrompt = e;
+  updateInstallBtn();
+});
+$('#installBtn').addEventListener('click', function(){
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function(){ deferredPrompt = null; updateInstallBtn(); });
+  } else if(isIOS){
+    $('#iosModal').classList.add('open');
+  } else {
+    toast('Look for "Install app" in your browser menu');
+  }
+});
+$('#iosClose').addEventListener('click', function(){ $('#iosModal').classList.remove('open'); });
+window.addEventListener('appinstalled', function(){
+  deferredPrompt = null;
+  updateInstallBtn();
+  toast('Added to your phone! 🎉');
+});
+
+/* ---------- boot ---------- */
+if(navigator.storage && navigator.storage.persist){
+  navigator.storage.persist()['catch'](function(){});
+}
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js')['catch'](function(){});
+  });
+}
+document.addEventListener('pointerdown', function(){ ac(); }, { once:true });
+show('home');
+</script>
+</body>
+</html>
