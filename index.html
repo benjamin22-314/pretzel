@@ -20,19 +20,20 @@
   --soft:#ffe3c2; --line:#f0ddc6; --danger:#e5484d; --radius:20px;
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+[hidden]{display:none !important;}
 html,body{margin:0; padding:0;}
 body{
   font-family:ui-rounded,"Segoe UI Rounded","Segoe UI",system-ui,-apple-system,sans-serif;
   background:var(--bg); color:var(--ink);
-  min-height:100dvh; display:flex; flex-direction:column;
+  height:100vh; height:100dvh; overflow:hidden; display:flex; flex-direction:column;
   touch-action:manipulation; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none;
   overflow-x:hidden;
   padding-left:env(safe-area-inset-left); padding-right:env(safe-area-inset-right);
 }
 header{
   display:flex; align-items:center; gap:10px;
-  padding:calc(10px + env(safe-area-inset-top)) 14px 10px;
-  position:sticky; top:0; background:var(--bg); z-index:10;
+  padding:calc(8px + env(safe-area-inset-top)) 14px 6px;
+  background:var(--bg); z-index:10; flex:none;
 }
 header h1{font-size:22px; margin:0; flex:1; text-align:center; white-space:nowrap;}
 .icon-btn{
@@ -43,15 +44,18 @@ header h1{font-size:22px; margin:0; flex:1; text-align:center; white-space:nowra
 .icon-btn:active{transform:scale(.93);}
 .icon-btn[hidden]{display:none;}
 .spacer48{width:48px; flex:none;}
-.steps{display:flex; justify-content:center; gap:14px; padding:0 0 4px;}
+.steps{display:flex; justify-content:center; gap:14px; padding:0 0 2px; flex:none;}
 .steps[hidden]{display:none;}
-.step{font-size:22px; opacity:.3; transition:all .25s; transform:scale(.9);}
+.step{font-size:20px; opacity:.3; transition:all .25s; transform:scale(.9);}
 .step.on{opacity:1; transform:scale(1.3);}
-main{flex:1; display:flex; flex-direction:column; width:100%; max-width:520px; margin:0 auto;}
-.screen{display:none; flex-direction:column; align-items:center; gap:14px; padding:8px 16px calc(28px + env(safe-area-inset-bottom)); flex:1;}
+main{flex:1; min-height:0; display:flex; flex-direction:column; width:100%; max-width:520px; margin:0 auto; overflow:hidden;}
+.screen{display:none; flex-direction:column; padding:0 16px; flex:1; min-height:0;}
 .screen.active{display:flex;}
-h2{font-size:26px; margin:4px 0 0; text-align:center;}
-.sub{font-size:17px; color:var(--ink-soft); margin:0; text-align:center;}
+.scr-body{flex:1 1 auto; min-height:0; overflow-y:auto; display:flex; flex-direction:column; align-items:center; gap:10px; width:100%; padding:4px 0 8px;}
+.scr-body:last-child{padding-bottom:calc(18px + env(safe-area-inset-bottom));}
+.scr-foot{flex:none; width:100%; display:flex; flex-direction:column; align-items:center; gap:10px; padding:8px 0 calc(14px + env(safe-area-inset-bottom));}
+h2{font-size:22px; margin:2px 0 0; text-align:center;}
+.sub{font-size:15px; color:var(--ink-soft); margin:0; text-align:center;}
 .btn{
   display:flex; align-items:center; justify-content:center; gap:10px;
   border:none; border-radius:18px; padding:16px 24px; font-size:20px; font-weight:700;
@@ -64,11 +68,11 @@ h2{font-size:26px; margin:4px 0 0; text-align:center;}
 .btn-go{background:var(--accent); color:#fff; box-shadow:0 4px 0 var(--accent-dark);}
 .btn-soft{border:2px solid var(--line);}
 .btn-danger{background:var(--danger); color:#fff; box-shadow:0 4px 0 #b8383c;}
-.btn-big{font-size:24px; padding:20px 28px; width:100%;}
+.btn-big{font-size:22px; padding:16px 26px; width:100%;}
 .btn-row{display:flex; gap:12px; width:100%; justify-content:center; flex-wrap:wrap;}
 .btn-row .btn{flex:1; min-width:140px;}
 /* home */
-.hero{font-size:96px; line-height:1; margin-top:16px; animation:bob 2.4s ease-in-out infinite;}
+.hero{font-size:84px; line-height:1; margin-top:8px; animation:bob 2.4s ease-in-out infinite;}
 @keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg);}50%{transform:translateY(-12px) rotate(4deg);}}
 .count-line{font-size:17px; color:var(--ink-soft); min-height:22px; margin:0;}
 .home-btns{display:flex; flex-direction:column; gap:14px; width:100%; max-width:340px; margin-top:6px;}
@@ -112,7 +116,9 @@ h2{font-size:26px; margin:4px 0 0; text-align:center;}
 @keyframes bounceIn{0%{transform:scale(0);}60%{transform:scale(1.15);}100%{transform:scale(1);}}
 #mixMsg{min-height:24px; font-weight:700; font-size:18px; text-align:center;}
 /* canvas */
-.canvas-wrap{width:min(92vw,440px); aspect-ratio:1/1; position:relative; flex:none;}
+.canvas-wrap{width:min(92vw,440px); width:clamp(220px, calc(100dvh - var(--chrome,460px)), min(92vw,440px)); aspect-ratio:1/1; position:relative; flex:none;}
+#slot-shape,#slot-decorate{--chrome:452px;}
+#slot-ready,#slot-eat{--chrome:392px;}
 .canvas-wrap canvas{
   width:100%; height:100%; display:block; border-radius:26px; touch-action:none;
   background:radial-gradient(circle at 50% 46%, #ffffff 0%, #ffffff 62%, #fbe9cf 63%, #fff8ec 100%);
@@ -124,19 +130,19 @@ h2{font-size:26px; margin:4px 0 0; text-align:center;}
 .steam:nth-child(3){animation-delay:1.3s;}
 @keyframes steamUp{0%{opacity:0; transform:translateY(18px) scaleX(1);}30%{opacity:.9;}100%{opacity:0; transform:translateY(-52px) scaleX(1.6);}}
 /* shape + toppings pickers */
-.chips{display:flex; gap:10px; overflow-x:auto; width:100%; padding:6px 2px 10px; scrollbar-width:none;}
+.chips{display:flex; gap:10px; overflow-x:auto; width:100%; padding:4px 2px 6px; scrollbar-width:none; flex:none;}
 .chips::-webkit-scrollbar{display:none;}
 .chip{
-  flex:none; width:82px; display:flex; flex-direction:column; align-items:center; gap:2px;
-  border:3px solid var(--line); border-radius:18px; background:var(--card);
-  padding:10px 4px 8px; font-family:inherit; font-size:13px; font-weight:700; color:var(--ink); cursor:pointer;
+  flex:none; width:76px; display:flex; flex-direction:column; align-items:center; gap:2px;
+  border:3px solid var(--line); border-radius:16px; background:var(--card);
+  padding:7px 4px 6px; font-family:inherit; font-size:12px; font-weight:700; color:var(--ink); cursor:pointer;
 }
-.chip .big{font-size:32px; line-height:1.15;}
+.chip .big{font-size:28px; line-height:1.15;}
 .chip.sel{border-color:var(--brand); background:var(--soft); transform:scale(1.05);}
 .tools{display:flex; gap:10px; justify-content:center; width:100%;}
-.tools .btn{padding:10px 16px; min-height:48px; font-size:16px;}
+.tools .btn{padding:8px 14px; min-height:44px; font-size:15px;}
 /* oven */
-.oven{width:min(80vw,330px); background:#6b5647; border-radius:26px; padding:16px 16px 12px; box-shadow:0 8px 0 rgba(60,40,20,.25);}
+.oven{width:min(80vw,330px); width:clamp(200px, calc(100dvh - 420px), min(80vw,330px)); background:#6b5647; border-radius:26px; padding:16px 16px 12px; box-shadow:0 8px 0 rgba(60,40,20,.25); flex:none;}
 .oven-top{display:flex; justify-content:center; gap:14px; margin-bottom:10px;}
 .knob{width:16px; height:16px; border-radius:50%; background:#c9b8a5; box-shadow:inset 0 -2px 0 rgba(0,0,0,.25);}
 .oven-window{background:#221a13; border:6px solid #4a3a2e; border-radius:16px; overflow:hidden; position:relative;}
@@ -144,7 +150,7 @@ h2{font-size:26px; margin:4px 0 0; text-align:center;}
 .glow{position:absolute; inset:0; background:radial-gradient(circle at 50% 80%, rgba(255,150,40,.55), rgba(255,120,20,0) 70%); opacity:0; transition:opacity .8s; pointer-events:none;}
 .oven.hot .glow{opacity:1;}
 .oven-handle{height:10px; border-radius:8px; background:#c9b8a5; margin-top:12px;}
-.bake-progress{width:min(80vw,330px); height:16px; border-radius:10px; background:#f3e3cc; overflow:hidden;}
+.bake-progress{width:min(80vw,330px); width:clamp(200px, calc(100dvh - 420px), min(80vw,330px)); height:16px; border-radius:10px; background:#f3e3cc; overflow:hidden; flex:none;}
 .bake-progress div{height:100%; width:0%; background:linear-gradient(90deg,#ffb24d,#e07a2f); transition:width .2s linear; border-radius:10px;}
 /* gallery */
 .gal-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px; width:100%;}
@@ -188,105 +194,133 @@ h2{font-size:26px; margin:4px 0 0; text-align:center;}
 <main>
 
 <section class="screen" id="scr-home">
-  <div class="hero">🥨</div>
-  <h2>Hi Amy!</h2>
-  <p class="sub">Let's make a yummy pretzel!</p>
-  <p class="count-line" id="countLine"></p>
-  <div class="home-btns">
-    <button class="btn btn-primary btn-big" id="startBtn">🥣 Make a pretzel!</button>
-    <button class="btn btn-soft" id="galleryBtn">📷 My pretzel photos</button>
-    <button class="btn btn-soft" id="installBtn" hidden>📲 Add to phone</button>
+  <div class="scr-body">
+    <div class="hero">🥨</div>
+    <h2>Hi Amy!</h2>
+    <p class="sub">Let's make a yummy pretzel!</p>
+    <p class="count-line" id="countLine"></p>
+    <div class="home-btns">
+      <button class="btn btn-primary btn-big" id="startBtn">🥣 Make a pretzel!</button>
+      <button class="btn btn-soft" id="galleryBtn">📷 My pretzel photos</button>
+      <button class="btn btn-soft" id="installBtn" hidden>📲 Add to phone</button>
+    </div>
   </div>
 </section>
 
 <section class="screen" id="scr-mix">
-  <h2>Mix the dough</h2>
-  <p class="sub" id="mixSub">Tap everything to put it in the bowl!</p>
-  <div class="bowl-zone">
-    <div class="dough-ball" id="doughBall">😊</div>
-    <button class="bowl-btn" id="bowlBtn" aria-label="Stir the bowl">
-      <div class="bowl" id="bowl">
-        <span class="spoon" id="spoon" hidden>🥄</span>
-        <div class="blob" id="blob"></div>
-      </div>
-    </button>
+  <div class="scr-body">
+    <h2>Mix the dough</h2>
+    <p class="sub" id="mixSub">Tap everything to put it in the bowl!</p>
+    <div class="bowl-zone">
+      <div class="dough-ball" id="doughBall">😊</div>
+      <button class="bowl-btn" id="bowlBtn" aria-label="Stir the bowl">
+        <div class="bowl" id="bowl">
+          <span class="spoon" id="spoon" hidden>🥄</span>
+          <div class="blob" id="blob"></div>
+        </div>
+      </button>
+    </div>
+    <p id="mixMsg"></p>
+    <div class="mix-grid" id="mixGrid"></div>
   </div>
-  <p id="mixMsg"></p>
-  <div class="mix-grid" id="mixGrid"></div>
 </section>
 
 <section class="screen" id="scr-shape">
-  <h2>Pick a shape!</h2>
-  <p class="sub">Or draw your very own</p>
-  <div class="chips" id="shapeChips"></div>
-  <div class="canvas-wrap" id="slot-shape"></div>
-  <div class="tools" id="drawTools" hidden>
-    <button class="btn btn-soft" id="undoStroke">↩️ Undo</button>
-    <button class="btn btn-soft" id="clearStrokes">🧽 Wipe</button>
+  <div class="scr-body">
+    <h2>Pick a shape!</h2>
+    <p class="sub">Or draw your very own</p>
+    <div class="chips" id="shapeChips"></div>
+    <div class="canvas-wrap" id="slot-shape"></div>
+    <div class="tools" id="drawTools" hidden>
+      <button class="btn btn-soft" id="undoStroke">↩️ Undo</button>
+      <button class="btn btn-soft" id="clearStrokes">🧽 Wipe</button>
+    </div>
   </div>
-  <button class="btn btn-go btn-big" id="shapeNext">Next: decorate! 🎨</button>
+  <div class="scr-foot">
+    <button class="btn btn-go btn-big" id="shapeNext">Next: decorate! 🎨</button>
+  </div>
 </section>
 
 <section class="screen" id="scr-decorate">
-  <h2>Decorate it!</h2>
-  <p class="sub">Pick a topping, then tap your pretzel</p>
-  <div class="chips" id="topChips"></div>
-  <div class="canvas-wrap" id="slot-decorate"></div>
-  <div class="tools">
-    <button class="btn btn-soft" id="undoTop">↩️ Undo</button>
-    <button class="btn btn-soft" id="clearTops">🧽 Clean off</button>
+  <div class="scr-body">
+    <h2>Decorate it!</h2>
+    <p class="sub">Pick a topping, then tap your pretzel</p>
+    <div class="chips" id="topChips"></div>
+    <div class="canvas-wrap" id="slot-decorate"></div>
+    <div class="tools">
+      <button class="btn btn-soft" id="undoTop">↩️ Undo</button>
+      <button class="btn btn-soft" id="clearTops">🧽 Clean off</button>
+    </div>
   </div>
-  <button class="btn btn-go btn-big" id="decorateNext">Next: bake it! 🔥</button>
+  <div class="scr-foot">
+    <button class="btn btn-go btn-big" id="decorateNext">Next: bake it! 🔥</button>
+  </div>
 </section>
 
 <section class="screen" id="scr-bake">
-  <h2>Into the oven!</h2>
-  <p class="sub" id="bakeSub">Press the button to bake</p>
-  <div class="oven" id="oven">
-    <div class="oven-top"><span class="knob"></span><span class="knob"></span><span class="knob"></span></div>
-    <div class="oven-window">
-      <canvas id="ovenCanvas" width="300" height="300"></canvas>
-      <div class="glow"></div>
+  <div class="scr-body">
+    <h2>Into the oven!</h2>
+    <p class="sub" id="bakeSub">Press the button to bake</p>
+    <div class="oven" id="oven">
+      <div class="oven-top"><span class="knob"></span><span class="knob"></span><span class="knob"></span></div>
+      <div class="oven-window">
+        <canvas id="ovenCanvas" width="300" height="300"></canvas>
+        <div class="glow"></div>
+      </div>
+      <div class="oven-handle"></div>
     </div>
-    <div class="oven-handle"></div>
+    <div class="bake-progress"><div id="bakeBar"></div></div>
   </div>
-  <div class="bake-progress"><div id="bakeBar"></div></div>
-  <button class="btn btn-primary btn-big" id="bakeBtn">🔥 Bake!</button>
+  <div class="scr-foot">
+    <button class="btn btn-primary btn-big" id="bakeBtn">🔥 Bake!</button>
+  </div>
 </section>
 
 <section class="screen" id="scr-ready">
-  <h2>Ta-daaa! 🎉</h2>
-  <p class="sub">Your pretzel is ready!</p>
-  <div class="canvas-wrap" id="slot-ready">
-    <div class="steamer"><span class="steam"></span><span class="steam"></span><span class="steam"></span></div>
+  <div class="scr-body">
+    <h2>Ta-daaa! 🎉</h2>
+    <p class="sub">Your pretzel is ready!</p>
+    <div class="canvas-wrap" id="slot-ready">
+      <div class="steamer"><span class="steam"></span><span class="steam"></span><span class="steam"></span></div>
+    </div>
   </div>
-  <div class="btn-row">
-    <button class="btn btn-soft" id="savePhotoBtn">📸 Save photo</button>
-    <button class="btn btn-go" id="eatBtn">😋 Eat it!</button>
+  <div class="scr-foot">
+    <div class="btn-row">
+      <button class="btn btn-soft" id="savePhotoBtn">📸 Save photo</button>
+      <button class="btn btn-go" id="eatBtn">😋 Eat it!</button>
+    </div>
   </div>
 </section>
 
 <section class="screen" id="scr-eat">
-  <h2>Munch munch!</h2>
-  <p class="sub">Tap the pretzel to take bites</p>
-  <div class="canvas-wrap" id="slot-eat"></div>
-  <button class="btn btn-soft" id="eatDone">All done!</button>
+  <div class="scr-body">
+    <h2>Munch munch!</h2>
+    <p class="sub">Tap the pretzel to take bites</p>
+    <div class="canvas-wrap" id="slot-eat"></div>
+  </div>
+  <div class="scr-foot">
+    <button class="btn btn-soft" id="eatDone">All done!</button>
+  </div>
 </section>
 
 <section class="screen" id="scr-done">
-  <div class="celebrate" id="doneEmoji">🎉</div>
-  <h2 id="doneTitle">Yummy!</h2>
-  <p class="sub" id="doneSub">That was a great pretzel!</p>
-  <div class="home-btns">
-    <button class="btn btn-primary btn-big" id="againBtn">🥨 Make another!</button>
-    <button class="btn btn-soft" id="donePhotos">📷 My pretzel photos</button>
+  <div class="scr-body">
+    <div class="celebrate" id="doneEmoji">🎉</div>
+    <h2 id="doneTitle">Yummy!</h2>
+    <p class="sub" id="doneSub">That was a great pretzel!</p>
+    <div class="home-btns">
+      <button class="btn btn-primary btn-big" id="againBtn">🥨 Make another!</button>
+      <button class="btn btn-soft" id="donePhotos">📷 My pretzel photos</button>
+    </div>
   </div>
 </section>
 
 <section class="screen" id="scr-gallery">
-  <h2>My pretzel photos</h2>
-  <div class="gal-grid" id="galGrid"></div>
-  <div class="empty" id="galEmpty" hidden>No pretzel photos yet!<br>Bake a pretzel to make one 🥨</div>
+  <div class="scr-body">
+    <h2>My pretzel photos</h2>
+    <div class="gal-grid" id="galGrid"></div>
+    <div class="empty" id="galEmpty" hidden>No pretzel photos yet!<br>Bake a pretzel to make one 🥨</div>
+  </div>
 </section>
 
 </main>
@@ -713,7 +747,8 @@ function show(id){
   $('#backSpacer').style.display = showBack ? 'none' : 'block';
   mountCanvasFor(id);
   onEnter(id);
-  window.scrollTo(0,0);
+  var sb = document.querySelector('#scr-' + id + ' .scr-body');
+  if(sb) sb.scrollTop = 0;
 }
 function onEnter(id){
   if(id === 'home'){ updateCountLine(); updateInstallBtn(); }

@@ -1,4 +1,4 @@
-var CACHE = 'pretzel-v1';
+var CACHE = 'pretzel-v2';
 var ASSETS = [
   './',
   './index.html',

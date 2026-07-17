@@ -17,6 +17,7 @@ A pretzel-making game for Amy! Mix the dough, shape it, decorate it, bake it, an
 ## Tech notes
 
 - Zero-dependency PWA: a single `index.html` with inline CSS/JS — no build step, frameworks, fonts, or CDNs. Works fully offline.
+- Fixed game-screen layout: the app locks to the viewport height (`100dvh`, no page scrolling) and the canvas shrinks to fit, so the action button for each step is always visible at the bottom.
 - Installable: `manifest.webmanifest` + service worker + PNG icons (192/512/maskable/apple-touch). "Add to phone" button triggers `beforeinstallprompt` on Android/desktop and shows Share → Add to Home Screen steps on iOS.
 - All paths are relative (`./`) so it works from the GitHub Pages subpath.
 - Service worker precaches the app shell, serves cache-first with background refresh, and uses a versioned cache name (`pretzel-v1`) — **bump it on every change** so installed phones pick up updates.
